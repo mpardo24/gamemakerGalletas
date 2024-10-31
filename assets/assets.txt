@@ -1,0 +1,16 @@
+botiquinGrande.png
+botiquinPequeno.png
+bucket.png
+corazonCompleto.png
+corazonRoto.png
+drop.png
+drop.wav
+dropBad.png
+fondo.png
+fondo.png.webp
+gameover_fondo.png
+hurt.ogg
+ladrido.mp3
+menu_de_inicio.png
+pausa.png
+rain.mp3
