@@ -4,42 +4,53 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-	public class GameLluviaMenu extends Game {
+public class GameLluviaMenu extends Game {
 
-		private SpriteBatch batch;
-		private BitmapFont font;
-		private int higherScore;
+    // Atributos principales de renderizado y fuente de texto
+    private SpriteBatch batch;
+    private BitmapFont font;
+    private int higherScore = 0;  // Variable para almacenar el puntaje más alto
 
-		public void create() {
-			batch = new SpriteBatch();
-			font = new BitmapFont(); // use libGDX's default Arial font
-			this.setScreen(new MainMenuScreen(this));
-		}
+    // Método que se llama al iniciar el juego
+    @Override
+    public void create() {
+        batch = new SpriteBatch();
+        font = new BitmapFont();  // Fuente por defecto
 
-		public void render() {
-			super.render(); // important!
-		}
+        // Mostrar el menú de inicio al arrancar el juego
+        this.setScreen(new MainMenuScreen(this));
+    }
 
-		public void dispose() {
-			batch.dispose();
-			font.dispose();
-		}
+    // Método de renderizado, llamado en cada fotograma
+    @Override
+    public void render() {
+        super.render();
+    }
 
-		public SpriteBatch getBatch() {
-			return batch;
-		}
+    // Método para liberar recursos cuando el juego se cierra
+    @Override
+    public void dispose() {
+        batch.dispose();
+        font.dispose();
+    }
 
-		public BitmapFont getFont() {
-			return font;
-		}
+    // Método getter para obtener el SpriteBatch compartido en todo el juego
+    public SpriteBatch getBatch() {
+        return batch;
+    }
 
-		public int getHigherScore() {
-			return higherScore;
-		}
+    // Método getter para obtener la fuente de texto compartida en todo el juego
+    public BitmapFont getFont() {
+        return font;
+    }
 
-		public void setHigherScore(int higherScore) {
-			this.higherScore = higherScore;
-		}
-		
+    // Método para obtener el puntaje más alto
+    public int getHigherScore() {
+        return higherScore;
+    }
 
-	}
+    // Método para establecer un nuevo puntaje más alto
+    public void setHigherScore(int higherScore) {
+        this.higherScore = higherScore;
+    }
+}
