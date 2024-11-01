@@ -1,0 +1,9 @@
+1. Installar IntellijIdea
+
+2. Abrir el proyecto usando Projects -> Open, y seleccionando la carpeta GameLluviaMenu2024
+
+3. Seguir pasos de instalación de LibGDX para la importación de proyectos, explicado en la pagina:
+https://libgdx.com/wiki/start/setup.
+
+4. Buscar dentro de la misma carpeta dentro del proyecto, el archivo Lwjgl3Launcher y ejecutar el programa, el cual esta en esta ruta: 
+GameLluviaMenu2024\lwjgl3\src\main\java\puppy\code\lwjgl3\Lwjgl3Launcher.java
