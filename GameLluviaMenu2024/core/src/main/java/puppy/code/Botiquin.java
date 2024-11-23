@@ -46,7 +46,8 @@ public abstract class Botiquin {
 
     // Reproducir el sonido del ladrido
     protected void reproducirLadrido() {
-        if (ladridoSound != null) {
+        // Reproducir sonido solo si está activado
+        if (ConfiguracionJuegoSingleton.obtenerInstancia().audioEstaActivado() && ladridoSound != null) {
             ladridoSound.play();
         }
     }
