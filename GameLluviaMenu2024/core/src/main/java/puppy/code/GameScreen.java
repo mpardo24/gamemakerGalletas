@@ -8,13 +8,14 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GameScreen implements Screen {
-    final GameLluviaMenu game;
+
+    private final GameLluviaMenu game;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private BitmapFont font;
@@ -25,11 +26,10 @@ public class GameScreen implements Screen {
     private Texture botiquinPequenoTexture;
     private Texture botiquinGrandeTexture;
     private Sound ladridoSound;
-    private int puntosParaAumentar = 200;  // Se usará para aumentar dificultad cada 200 puntos
-    private float tiempoMensajeDificultad = 0;  // Controla la duración del mensaje en pantalla
+    private int puntosParaAumentar = 200;
+    private float tiempoMensajeDificultad = 0;
     private boolean mostrarMensajeDificultad = false;
 
-    // Cargar texturas de los corazones
     private Texture corazonCompleto;
     private Texture corazonRoto;
 
@@ -37,154 +37,162 @@ public class GameScreen implements Screen {
         this.game = game;
         this.batch = game.getBatch();
         this.font = game.getFont();
-        Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
-        this.tarro = new Tarro(new Texture(Gdx.files.internal("bucket.png")), hurtSound);
+        this.camera = new OrthographicCamera();
+        this.camera.setToOrtho(false, 800.0F, 480.0F);
+
+        // Configuración de texturas y sonidos
         this.backgroundImage = new Texture(Gdx.files.internal("fondo.png"));
+        this.botiquinPequenoTexture = new Texture(Gdx.files.internal("botiquinPequeno.png"));
+        this.botiquinGrandeTexture = new Texture(Gdx.files.internal("botiquinGrande.png"));
+        this.corazonCompleto = new Texture(Gdx.files.internal("corazonCompleto.png"));
+        this.corazonRoto = new Texture(Gdx.files.internal("corazonRoto.png"));
+        Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
+        this.ladridoSound = Gdx.audio.newSound(Gdx.files.internal("ladrido.mp3"));
+
+        // Inicialización del jugador
+        this.tarro = new Tarro(new Texture(Gdx.files.internal("bucket.png")), hurtSound);
+        this.tarro.crear();
+
+        // Inicialización de la lluvia
         Texture gota = new Texture(Gdx.files.internal("drop.png"));
         Texture gotaMala = new Texture(Gdx.files.internal("dropBad.png"));
         Sound dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
         Music rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-        this.lluvia = new Lluvia(gota, gotaMala, dropSound, rainMusic);
-        this.camera = new OrthographicCamera();
-        this.camera.setToOrtho(false, 800.0F, 480.0F);
-        this.batch = new SpriteBatch();
-        this.tarro.crear();
-        this.lluvia.crear();
-        this.botiquinPequenoTexture = new Texture(Gdx.files.internal("botiquinPequeno.png"));
-        this.botiquinGrandeTexture = new Texture(Gdx.files.internal("botiquinGrande.png"));
-        this.ladridoSound = Gdx.audio.newSound(Gdx.files.internal("ladrido.mp3"));
 
-        // Cargar imágenes de los corazones solo una vez
-        this.corazonCompleto = new Texture(Gdx.files.internal("corazonCompleto.png"));
-        this.corazonRoto = new Texture(Gdx.files.internal("corazonRoto.png"));
+        this.lluvia = new Lluvia(gota, gotaMala, dropSound, rainMusic);
+        this.lluvia.crear();
     }
 
+    @Override
     public void render(float delta) {
-        // Verificar si los puntos han alcanzado el umbral para aumentar la dificultad
+        ConfiguracionJuegoSingleton configuracion = ConfiguracionJuegoSingleton.obtenerInstancia();
+
+        // Verificar si se debe aumentar la dificultad
         if (tarro.getPuntos() >= puntosParaAumentar) {
-            puntosParaAumentar += 200;  // Aumentar el umbral para el próximo incremento
+            puntosParaAumentar += 200;
             mostrarMensajeDificultad = true;
-            tiempoMensajeDificultad = 2.0f;  // Mostrar el mensaje por 2 segundos
-            lluvia.aumentarDificultad();  // Aumentar la dificultad en Lluvia
+            tiempoMensajeDificultad = 2.0f;
+            lluvia.aumentarDificultad();
         }
+
+        // Cambiar a pantalla de pausa
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new PausaScreen(game, this));
             return;
         }
 
+        // Renderizado de la pantalla de juego
         ScreenUtils.clear(0.0F, 0.0F, 0.2F, 1.0F);
-        this.camera.update();
-        this.batch.setProjectionMatrix(this.camera.combined);
-        this.batch.begin();
+        camera.update();
+        batch.setProjectionMatrix(camera.combined);
 
-        // Ajustar tamaño de fuente
-        font.getData().setScale(2.0f);  // Aumentar el tamaño de todos los textos
+        batch.begin();
+        batch.draw(backgroundImage, 0.0F, 0.0F, 800.0F, 480.0F);
+        font.getData().setScale(2.0f);
+        font.draw(batch, "Puntos: " + tarro.getPuntos(), 10, 470);
+        font.draw(batch, "HighScore: " + configuracion.obtenerPuntuacionMaxima(), 400, 470); // Mostrar HighScore
+        dibujarCorazones();
 
-        // Dibuja el fondo
-        this.batch.draw(this.backgroundImage, 0.0F, 0.0F, 800.0F, 480.0F);
-        this.font.draw(this.batch, "Galletas totales: " + this.tarro.getPuntos(), 5.0F, 475.0F);
-        this.font.draw(this.batch, "HighScore: " + this.game.getHigherScore(), this.camera.viewportWidth / 2.0F - 50.0F, 475.0F);
-
-        // Dibuja las vidas como corazones
-        drawHearts();
-
-        if (!this.tarro.estaHerido()) {
-            this.tarro.actualizarMovimiento();
-            if (!this.lluvia.actualizarMovimiento(this.tarro)) {
-                if (this.game.getHigherScore() < this.tarro.getPuntos()) {
-                    this.game.setHigherScore(this.tarro.getPuntos());
+        // Actualizar jugador y gotas
+        if (!tarro.estaHerido()) {
+            tarro.actualizarMovimiento();
+            if (!lluvia.actualizarMovimiento(tarro)) {
+                if (tarro.getPuntos() > configuracion.obtenerPuntuacionMaxima()) {
+                    configuracion.configurarPuntuacionMaxima(tarro.getPuntos());
                 }
-
-                this.game.setScreen(new GameOverScreen(this.game));
-                this.dispose();
+                game.setScreen(new GameOverScreen(game, tarro.getPuntos())); // Pasar puntaje actual a GameOverScreen
+                dispose();
             }
         }
 
-        this.tarro.dibujar(this.batch);
-        this.lluvia.actualizarDibujoLluvia(this.batch);
+        tarro.dibujar(batch);
+        lluvia.actualizarDibujoLluvia(batch);
 
-        // Verificar si se crea un nuevo botiquín
-        if (this.botiquin == null && MathUtils.random(1, 100) < 5) {
-            float x = (float)MathUtils.random(0, 768);
-            float y = 480.0F;
-            if (MathUtils.random(1, 100) < 75) {
-                this.botiquin = new BotiquinPequeno(this.botiquinPequenoTexture, x, y, this.ladridoSound);
-            } else {
-                this.botiquin = new BotiquinGrande(this.botiquinGrandeTexture, x, y, this.ladridoSound);
-            }
-        }
+        // Manejo de botiquines
+        gestionarBotiquines();
 
-        // Actualizar y dibujar botiquín si está presente
-        if (this.botiquin != null) {
-            ((Botiquin) this.botiquin).actualizarMovimiento(tarro);
-            ((Botiquin) this.botiquin).dibujar(this.batch);
-
-            // Detectar si el botiquín colisiona con el tarro (jugador)
-            if (((Botiquin) this.botiquin).getArea().overlaps(this.tarro.getArea())) {
-                this.botiquin.collect(this.tarro);  // Llama al método collect de la interfaz
-                this.botiquin = null;
-            }
-
-            // Si el botiquín sale de la pantalla
-            if (this.botiquin != null && ((Botiquin) this.botiquin).fueraDePantalla()) {
-                this.botiquin = null;
-            }
-        }
-
-        // Mostrar mensaje de aumento de dificultad
+        // Mensaje de aumento de dificultad
         if (mostrarMensajeDificultad) {
-            // Usar GlyphLayout para centrar el texto
-            GlyphLayout layout = new GlyphLayout(font, "¡Ha aumentado la dificultad!");
-            float x = (this.camera.viewportWidth - layout.width) / 2; // Centrado
-            this.font.draw(this.batch, "¡Ha aumentado la dificultad!", x, 240);
+            GlyphLayout layout = new GlyphLayout(font, "¡Dificultad aumentada!");
+            float x = (camera.viewportWidth - layout.width) / 2;
+            font.draw(batch, "¡Dificultad aumentada!", x, 240);
             tiempoMensajeDificultad -= delta;
             if (tiempoMensajeDificultad <= 0) {
-                mostrarMensajeDificultad = false;  // Ocultar el mensaje después de 2 segundos
+                mostrarMensajeDificultad = false;
             }
         }
 
-        this.batch.end();
+        batch.end();
     }
 
-    private void drawHearts() {
-        // Coordenadas para dibujar los corazones
-        float xOffset = 620; // Posición x de los corazones
-        float yPosition = 420; // Posición y de los corazones
-
+    private void dibujarCorazones() {
+        float xOffset = 620;
+        float yOffset = 420;
         for (int i = 0; i < 3; i++) {
             if (i < tarro.getVidas()) {
-                batch.draw(corazonCompleto, xOffset, yPosition);
+                batch.draw(corazonCompleto, xOffset, yOffset);
             } else {
-                batch.draw(corazonRoto, xOffset, yPosition);
+                batch.draw(corazonRoto, xOffset, yOffset);
             }
-            xOffset +=59; // Espacio entre corazones
+            xOffset += 59;
         }
     }
 
+    private void gestionarBotiquines() {
+        if (botiquin == null && MathUtils.random(1, 100) < 5) {
+            float x = MathUtils.random(0, 768);
+            float y = 480.0F;
+            botiquin = MathUtils.random(1, 100) < 75
+                    ? new BotiquinPequeno(botiquinPequenoTexture, x, y, ladridoSound)
+                    : new BotiquinGrande(botiquinGrandeTexture, x, y, ladridoSound);
+        }
+
+        if (botiquin != null) {
+            ((Botiquin) botiquin).actualizarMovimiento(tarro);
+            ((Botiquin) botiquin).dibujar(batch);
+
+            if (((Botiquin) botiquin).getArea().overlaps(tarro.getArea())) {
+                botiquin.collect(tarro);
+                botiquin = null;
+            }
+
+            if (botiquin != null && ((Botiquin) botiquin).fueraDePantalla()) {
+                botiquin = null;
+            }
+        }
+    }
+
+    @Override
     public void resize(int width, int height) {}
 
+    @Override
     public void show() {
-        this.lluvia.continuar();
+        lluvia.continuar();
     }
 
-    public void hide() {}
+    @Override
+    public void hide() {
+        // Pausar la música si salimos del GameScreen
+        lluvia.pausar();
+    }
 
+    @Override
     public void pause() {
-        this.lluvia.pausar();
-        this.game.setScreen(new PausaScreen(this.game, this));
+        lluvia.pausar();
+        game.setScreen(new PausaScreen(game, this));
     }
 
+    @Override
     public void resume() {}
 
+    @Override
     public void dispose() {
-        this.tarro.destruir();
-        this.lluvia.destruir();
-        this.backgroundImage.dispose();
-        this.botiquinPequenoTexture.dispose();
-        this.botiquinGrandeTexture.dispose();
-        this.ladridoSound.dispose();
-
-        // Destruir texturas de los corazones al final
+        tarro.destruir();
+        lluvia.destruir();
+        backgroundImage.dispose();
+        botiquinPequenoTexture.dispose();
+        botiquinGrandeTexture.dispose();
+        ladridoSound.dispose();
         corazonCompleto.dispose();
         corazonRoto.dispose();
     }
