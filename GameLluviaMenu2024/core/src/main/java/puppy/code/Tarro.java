@@ -12,8 +12,8 @@ public class Tarro {
     private Rectangle bucket;
     private Texture bucketImage;
     private Sound sonidoHerido;
-    private int vidas = 3;
-    private int puntos = 0;
+    private int vidas = 3; // Vidas iniciales del jugador
+    private int puntos = 0; // Puntos iniciales del jugador
     private int velx = 400;
     private boolean herido = false;
     private int tiempoHeridoMax = 50;
@@ -24,12 +24,12 @@ public class Tarro {
         sonidoHerido = ss;
     }
 
-    public int getVidas() {
-        return vidas;
+    public int getPuntos() {
+        return puntos; // Retornar puntos acumulados correctamente
     }
 
-    public int getPuntos() {
-        return puntos;
+    public int getVidas() {
+        return vidas;
     }
 
     public Rectangle getArea() {
@@ -37,7 +37,7 @@ public class Tarro {
     }
 
     public void sumarPuntos(int pp) {
-        puntos += pp;
+        puntos += pp; // Sumar puntos al total acumulado
     }
 
     public void crear() {
@@ -52,8 +52,13 @@ public class Tarro {
         vidas--;
         herido = true;
         tiempoHerido = tiempoHeridoMax;
-        sonidoHerido.play();
+
+        // Reproducir sonido solo si está activado
+        if (ConfiguracionJuegoSingleton.obtenerInstancia().audioEstaActivado()) {
+            sonidoHerido.play();
+        }
     }
+
 
     public void dibujar(SpriteBatch batch) {
         if (!herido)
@@ -66,9 +71,9 @@ public class Tarro {
     }
 
     public void actualizarMovimiento() {
-        // movimiento desde teclado
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= velx * Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += velx * Gdx.graphics.getDeltaTime();
+        // Movimiento desde teclado
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= velx * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += velx * Gdx.graphics.getDeltaTime();
 
         // Lógica para teletransporte
         if (bucket.x < 0) {
@@ -86,9 +91,9 @@ public class Tarro {
     public boolean estaHerido() {
         return herido;
     }
+
     public void sumarVida(int cantidad) {
         vidas += cantidad;
-        if (vidas > 3) vidas = 3;  // Limitar a 3 vidas máximo
+        if (vidas > 3) vidas = 3; // Limitar a 3 vidas máximo
     }
-
 }
