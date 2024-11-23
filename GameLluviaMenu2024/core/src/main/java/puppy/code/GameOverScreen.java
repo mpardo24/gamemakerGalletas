@@ -9,44 +9,48 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GameOverScreen implements Screen {
+
     private final GameLluviaMenu game;
-    private SpriteBatch batch;
-    private BitmapFont font;
-    private OrthographicCamera camera;
+    private final SpriteBatch batch;
+    private final BitmapFont font;
+    private final OrthographicCamera camera;
+    private final Texture backgroundImage;
+    private final int puntajeReciente;
 
-    // Variable para el fondo
-    private Texture backgroundImage;
-
-    public GameOverScreen(final GameLluviaMenu game) {
+    public GameOverScreen(final GameLluviaMenu game, int puntajeReciente) {
         this.game = game;
         this.batch = game.getBatch();
         this.font = game.getFont();
-
-        // Inicializar la cámara
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);  // Ajusta esta resolución si es necesario
-
-        // Cargar la imagen de fondo (asegúrate de que la imagen esté en assets)
-        backgroundImage = new Texture(Gdx.files.internal("gameover_fondo.png"));
+        this.camera = new OrthographicCamera();
+        this.camera.setToOrtho(false, 800, 480);
+        this.backgroundImage = new Texture(Gdx.files.internal("gameover_fondo.png"));
+        this.puntajeReciente = puntajeReciente;
     }
 
     @Override
     public void render(float delta) {
-        // Limpia la pantalla
+        ConfiguracionJuegoSingleton configuracion = ConfiguracionJuegoSingleton.obtenerInstancia();
+
+        // Limpiar la pantalla
         ScreenUtils.clear(0, 0, 0.2f, 1);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
 
-        // Dibujar la imagen de fondo
-        batch.draw(backgroundImage, 0, 0, 800, 480);  // Ajustar a la resolución de tu pantalla
+        // Fondo del Game Over
+        batch.draw(backgroundImage, 0, 0, 800, 480);
 
-        // Puedes agregar más lógica aquí si es necesario
+        // Mensajes de fin del juego
+        font.getData().setScale(2.0f);
+        font.draw(batch, "GAME OVER", 300, 350);
+        font.draw(batch, "Tu puntuación: " + puntajeReciente, 280, 300); // Mostrar puntaje reciente
+        font.draw(batch, "Puntuación máxima: " + configuracion.obtenerPuntuacionMaxima(), 250, 250);
+        font.draw(batch, "Toque para reiniciar", 280, 200);
 
         batch.end();
 
-        // Reiniciar el juego si se toca la pantalla
+        // Reiniciar el juego si el jugador toca la pantalla
         if (Gdx.input.isTouched()) {
             game.setScreen(new GameScreen(game));
             dispose();
@@ -54,28 +58,18 @@ public class GameOverScreen implements Screen {
     }
 
     @Override
-    public void resize(int width, int height) {
-    }
-
-    @Override
-    public void show() {
-    }
-
-    @Override
-    public void hide() {
-    }
-
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
     public void dispose() {
-        // Liberar recursos
         backgroundImage.dispose();
     }
+
+    @Override
+    public void resize(int width, int height) {}
+    @Override
+    public void show() {}
+    @Override
+    public void hide() {}
+    @Override
+    public void pause() {}
+    @Override
+    public void resume() {}
 }
