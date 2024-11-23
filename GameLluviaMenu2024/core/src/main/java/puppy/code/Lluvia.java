@@ -18,23 +18,28 @@ public class Lluvia {
     private Texture gotaMala;
     private Sound dropSound;
     private Music rainMusic;
-    private float velocidadCaida = 300;  // Velocidad base de caída de las gotas
-    private long tiempoEntreGotas = 1000000000;  // Tiempo base entre gotas (nanosegundos)
+    private float velocidadCaida = 300;  // Velocidad base de caída
+    private long tiempoEntreGotas = 1_000_000_000L;  // Tiempo base entre gotas
 
-    public Lluvia(Texture gotaBuena, Texture gotaMala, Sound ss, Music mm) {
-        rainMusic = mm;
-        dropSound = ss;
+    public Lluvia(Texture gotaBuena, Texture gotaMala, Sound dropSound, Music rainMusic) {
         this.gotaBuena = gotaBuena;
         this.gotaMala = gotaMala;
+        this.dropSound = dropSound;
+        this.rainMusic = rainMusic;
     }
 
     public void crear() {
-        rainDropsPos = new Array<Rectangle>();
-        rainDropsType = new Array<Integer>();
+        rainDropsPos = new Array<>();
+        rainDropsType = new Array<>();
         crearGotaDeLluvia();
-        rainMusic.setLooping(true);
-        rainMusic.play();
+
+        // Reproducir música solo si está activada
+        if (ConfiguracionJuegoSingleton.obtenerInstancia().audioEstaActivado()) {
+            rainMusic.setLooping(true);
+            rainMusic.play();
+        }
     }
+
 
     private void crearGotaDeLluvia() {
         Rectangle raindrop = new Rectangle();
@@ -43,47 +48,42 @@ public class Lluvia {
         raindrop.width = 64;
         raindrop.height = 64;
         rainDropsPos.add(raindrop);
-        if (MathUtils.random(1, 10) < 5) {
-            rainDropsType.add(1);  // Gota dañina
-        } else {
-            rainDropsType.add(2);  // Gota buena
-        }
+        rainDropsType.add(MathUtils.random(1, 10) < 5 ? 1 : 2);  // Gota dañina o buena
         lastDropTime = TimeUtils.nanoTime();
     }
 
     public void aumentarDificultad() {
-        // Aumenta la velocidad de caída y reduce el tiempo entre gotas
-        velocidadCaida += 50;  // Aumenta la velocidad de caída en 50
-        tiempoEntreGotas = (long) (tiempoEntreGotas * 0.9);  // Reduce el tiempo entre gotas en un 10%
+        velocidadCaida += 50;  // Aumenta la velocidad de caída
+        tiempoEntreGotas *= 0.9;  // Reduce el tiempo entre gotas en un 10%
     }
 
     public boolean actualizarMovimiento(Tarro tarro) {
-        // Crear nueva gota si ha pasado suficiente tiempo
         if (TimeUtils.nanoTime() - lastDropTime > tiempoEntreGotas) {
             crearGotaDeLluvia();
         }
 
-        // Revisar el movimiento de las gotas
         for (int i = 0; i < rainDropsPos.size; i++) {
             Rectangle raindrop = rainDropsPos.get(i);
             raindrop.y -= velocidadCaida * Gdx.graphics.getDeltaTime();
 
-            // Si la gota cae fuera de la pantalla, eliminarla
             if (raindrop.y + 64 < 0) {
                 rainDropsPos.removeIndex(i);
                 rainDropsType.removeIndex(i);
             }
 
-            // Si la gota colisiona con el tarro
             if (raindrop.overlaps(tarro.getArea())) {
-                if (rainDropsType.get(i) == 1) {  // Gota dañina
+                if (rainDropsType.get(i) == 1) {
                     tarro.dañar();
                     if (tarro.getVidas() <= 0) {
-                        return false;  // El juego termina si el tarro pierde todas las vidas
+                        return false; // Termina el juego
                     }
-                } else {  // Gota buena
+                } else {
                     tarro.sumarPuntos(10);
-                    dropSound.play();
+
+                    // Reproducir sonido solo si está activado
+                    if (ConfiguracionJuegoSingleton.obtenerInstancia().audioEstaActivado()) {
+                        dropSound.play();
+                    }
                 }
                 rainDropsPos.removeIndex(i);
                 rainDropsType.removeIndex(i);
@@ -92,27 +92,40 @@ public class Lluvia {
         return true;
     }
 
+
     public void actualizarDibujoLluvia(SpriteBatch batch) {
         for (int i = 0; i < rainDropsPos.size; i++) {
             Rectangle raindrop = rainDropsPos.get(i);
-            if (rainDropsType.get(i) == 1) {  // Gota dañina
-                batch.draw(gotaMala, raindrop.x, raindrop.y);
-            } else {  // Gota buena
-                batch.draw(gotaBuena, raindrop.x, raindrop.y);
-            }
+            batch.draw(rainDropsType.get(i) == 1 ? gotaMala : gotaBuena, raindrop.x, raindrop.y);
         }
     }
 
+    public void setVelocidadCaida(float velocidad) {
+        this.velocidadCaida = velocidad;
+    }
+
+    public void setTiempoEntreGotas(long tiempo) {
+        this.tiempoEntreGotas = tiempo;
+    }
+
     public void destruir() {
-        dropSound.dispose();
-        rainMusic.dispose();
+        if (rainMusic != null) {
+            rainMusic.stop();
+            rainMusic.dispose();
+        }
     }
 
     public void pausar() {
-        rainMusic.pause();
+        if (rainMusic != null && rainMusic.isPlaying()) {
+            rainMusic.pause();
+        }
     }
 
     public void continuar() {
-        rainMusic.play();
+        // Reanudar música solo si está activada
+        if (ConfiguracionJuegoSingleton.obtenerInstancia().audioEstaActivado()) {
+            rainMusic.play();
+        }
     }
 }
+
