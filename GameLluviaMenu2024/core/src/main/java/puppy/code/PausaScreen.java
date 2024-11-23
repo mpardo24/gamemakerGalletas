@@ -13,21 +13,21 @@ public class PausaScreen implements Screen {
 
     private final GameLluviaMenu game;
     private final GameScreen juego;
-    private SpriteBatch batch;
-    private BitmapFont font;
-    private OrthographicCamera camera;
-    private Texture pausaImagen;  // Imagen para la pausa
+    private final SpriteBatch batch;
+    private final BitmapFont font;
+    private final OrthographicCamera camera;
+    private final Texture pausaImagen;
 
     public PausaScreen(final GameLluviaMenu game, GameScreen juego) {
         this.game = game;
         this.juego = juego;
         this.batch = game.getBatch();
         this.font = game.getFont();
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
+        this.camera = new OrthographicCamera();
+        this.camera.setToOrtho(false, 800, 480);
 
-        // Cargar la imagen de pausa desde los assets
-        pausaImagen = new Texture(Gdx.files.internal("pausa.png"));  // Imagen guardada como pausa.png en assets
+        // Cargar la imagen de pausa
+        this.pausaImagen = new Texture(Gdx.files.internal("pausa.png"));
     }
 
     @Override
@@ -40,37 +40,43 @@ public class PausaScreen implements Screen {
         batch.begin();
 
         // Dibujar la imagen de pausa
-        batch.draw(pausaImagen, 0, 0, 800, 480);  // Dibuja la imagen en toda la pantalla
+        batch.draw(pausaImagen, 0, 0, 800, 480);
 
-        font.draw(batch, "", 100, 150);
-        font.draw(batch, "", 100, 100);
+        // Mostrar mensajes de pausa
+        font.getData().setScale(2.0f);
+        font.draw(batch, "Juego en pausa", 300, 400);
+        font.draw(batch, "Usa las flechas para reanudar el juego", 200, 300);
+        font.draw(batch, "Presiona ESC para volver al menu inicial", 200, 250);
+
         batch.end();
 
-        // Verificar si se presiona "ESC" para reanudar el juego
+        // Reanudar el juego con las flechas
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT) ||
+                Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            game.setScreen(juego); // Regresar al juego
+            dispose();
+        }
+
+        // Volver al menú inicial con ESC
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            game.setScreen(juego);  // Regresa al juego
+            game.setScreen(new MainMenuScreen(game));
             dispose();
         }
     }
 
     @Override
-    public void show() {}
+    public void dispose() {
+        pausaImagen.dispose();
+    }
 
     @Override
     public void resize(int width, int height) {}
-
     @Override
-    public void pause() {}
-
-    @Override
-    public void resume() {}
-
+    public void show() {}
     @Override
     public void hide() {}
-
     @Override
-    public void dispose() {
-        // Liberar la imagen de pausa cuando ya no se necesite
-        pausaImagen.dispose();
-    }
+    public void pause() {}
+    @Override
+    public void resume() {}
 }
