@@ -22,7 +22,7 @@ public class GameScreen implements Screen {
     private Tarro tarro;
     private Lluvia lluvia;
     private Texture backgroundImage;
-    private Collectible botiquin;
+    private Botiquin botiquin; // Ahora se usa la clase Botiquin
     private Texture botiquinPequenoTexture;
     private Texture botiquinGrandeTexture;
     private Sound ladridoSound;
@@ -142,21 +142,29 @@ public class GameScreen implements Screen {
         if (botiquin == null && MathUtils.random(1, 100) < 5) {
             float x = MathUtils.random(0, 768);
             float y = 480.0F;
-            botiquin = MathUtils.random(1, 100) < 75
-                    ? new BotiquinPequeno(botiquinPequenoTexture, x, y, ladridoSound)
-                    : new BotiquinGrande(botiquinGrandeTexture, x, y, ladridoSound);
+
+            // Usar fábricas para crear botiquines dinámicamente
+            BotiquinFactory factory = MathUtils.random(1, 100) < 75
+                    ? new BotiquinPequenoFactory()
+                    : new BotiquinGrandeFactory();
+
+            botiquin = factory.crearBotiquin(
+                    factory instanceof BotiquinPequenoFactory ? botiquinPequenoTexture : botiquinGrandeTexture,
+                    x, y,
+                    ladridoSound
+            );
         }
 
         if (botiquin != null) {
-            ((Botiquin) botiquin).actualizarMovimiento(tarro);
-            ((Botiquin) botiquin).dibujar(batch);
+            botiquin.actualizarMovimiento(Gdx.graphics.getDeltaTime(), tarro.estaHerido());
+            botiquin.dibujar(batch);
 
-            if (((Botiquin) botiquin).getArea().overlaps(tarro.getArea())) {
-                botiquin.collect(tarro);
+            if (botiquin.colisionaConTarro(tarro)) {
+                botiquin.aplicarEfecto(tarro);
                 botiquin = null;
             }
 
-            if (botiquin != null && ((Botiquin) botiquin).fueraDePantalla()) {
+            if (botiquin != null && botiquin.estaFueraDePantalla()) {
                 botiquin = null;
             }
         }
@@ -172,7 +180,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-        // Pausar la música si salimos del GameScreen
         lluvia.pausar();
     }
 
