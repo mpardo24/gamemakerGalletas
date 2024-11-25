@@ -1,70 +1,80 @@
-# Proyecto Come Galletas (Juego en LibGDX)
+# 🎮 Proyecto GameMaker: Modificación de GameLluvia 🚀
 
-Este proyecto consiste en el desarrollo de un videojuego arcade llamado **"Come Galletas"**. El objetivo del juego es ayudar a un personaje, un perro, a recolectar galletas mientras esquiva bombas y recoge botiquines para mantenerse con vida. Fue desarrollado como parte de la asignatura de Programación Avanzada en la Pontificia Universidad Católica de Valparaíso, utilizando la biblioteca **LibGDX**, y el proyecto base entregado por el Académico Claudio Cubillos.
+Este proyecto consiste en la modificación del videojuego **GameLluvia** para crear una experiencia mejorada y adaptada a nuevas funcionalidades. Fue desarrollado como parte del curso de Programación Avanzada en la **Pontificia Universidad Católica de Valparaíso**, utilizando el framework **LibGDX**.
 
-## Descripción
+## 🌟 Descripción General
 
-En **Come Galletas**, el jugador controla un personaje canino usando las teclas de dirección y debe recolectar tantos puntos como sea posible. Los puntos se acumulan al recoger galletas y botiquines. Las bombas, sin embargo, deben evitarse, ya que al tocarlas el jugador pierde una vida. El juego finaliza cuando el jugador pierde todas las vidas.
+En **GameLluvia**, el jugador controla un personaje con el objetivo de recolectar puntos a través de diversos elementos beneficiosos mientras evita peligros. La mecánica de juego ha sido optimizada y ampliada respecto a su versión base, incluyendo mejoras en la jugabilidad y la estructura del código.
 
-## Funcionalidades
+## ✨ Funcionalidades Principales
 
-- **Control del personaje**: Movimiento del personaje (perro) para recolectar objetos y evitar obstáculos.
-- **Recolección de ítems**:
-  - **Galletas**: Otorgan puntos al jugador.
-  - **Botiquines**: Pueden restaurar vidas si el jugador tiene menos de tres, o proporcionar puntos adicionales si tiene el máximo de vidas.
-  - **Bombas**: El jugador pierde una vida al tocarlas.
-- **Sistema de vidas**: El jugador comienza con tres vidas, y cada colisión con una bomba disminuye una.
-- **Incremento de dificultad**: La frecuencia y velocidad de los objetos aumentan a medida que el jugador alcanza ciertos puntajes.
-- **Pantallas de juego**:
-  - **Menú principal**: Pantalla inicial del juego.
-  - **Pantalla de juego**: Donde ocurre la acción principal.
-  - **Pantalla de pausa**: Permite al jugador pausar la partida.
-  - **Pantalla de Game Over**: Se muestra cuando el jugador pierde todas las vidas.
+- **🎮 Control del personaje:** Maneja al protagonista y recolecta ítems usando teclas direccionales.
+- **🍪 Recolección de objetos:**
+  - **Galletas:** Otorgan puntos.
+  - **Botiquines:** Restauran vidas o, si ya están completas, otorgan puntos adicionales.
+  - **Bombas:** Hacen perder una vida al jugador.
+- **💖 Sistema de vidas:** El jugador comienza con tres vidas; puede recuperarlas o ganar puntos adicionales mediante botiquines.
+- **📈 Dificultad progresiva:** Los ítems aparecen con mayor frecuencia y velocidad conforme avanza el juego.
+- **🖥️ Pantallas del juego:**
+  - **Menú principal**: Navegación inicial.
+  - **Pantalla de juego**: Acción principal.
+  - **Pantalla de pausa**: Para detener temporalmente la partida.
+  - **Game Over**: Mostrando el puntaje final.
 
-## Estructura del Proyecto
+## 🛠️ Mejoras Técnicas
 
-El proyecto está organizado en varias clases, cada una con una responsabilidad específica:
+- **🎨 Fondos personalizados:** Pantallas diseñadas con elementos visuales únicos para cada estado del juego.
+- **🌀 Movilidad avanzada:** Desplazamiento continuo del personaje entre los bordes de la pantalla.
+- **📋 Refactorización del código:**
+  - Implementación del patrón **Modelo-Vista-Controlador (MVC)**.
+  - Uso de patrones de diseño como **Singleton**, **Template Method**, **Strategy** y **Abstract Factory** para optimizar la estructura y escalabilidad del juego.
+  - Modularización y encapsulamiento de atributos clave, como vidas y puntos.
 
-- **Clase `GameLluviaMenu`**: Clase principal que inicializa el juego y controla el flujo entre pantallas.
-- **Clase `Tarro`**: Representa al personaje controlado por el jugador, incluyendo su movimiento y administración de vidas y puntos.
-- **Clase `Botiquin` (Abstracta)**: Define los atributos y métodos comunes para los botiquines.
-  - **`BotiquinPequeno`** y **`BotiquinGrande`**: Subclases de `Botiquin` que implementan los efectos específicos de cada tipo de botiquín.
-- **Clase `Lluvia`**: Controla la generación de objetos como galletas y bombas que caen desde la parte superior de la pantalla.
-- **Clases de Pantallas (`Screen`)**: Cada fase del juego tiene una clase dedicada (`MainMenuScreen`, `GameScreen`, `PausaScreen`, `GameOverScreen`), lo que facilita la navegación y la organización del flujo del juego.
+## 💡 Diseño Orientado a Objetos
 
-## Diseño Conceptual
+El juego ha sido desarrollado respetando los principios de Programación Orientada a Objetos (POO), destacando:
 
-- **Patrón Modelo-Vista-Controlador (MVC)**: El juego sigue el patrón MVC, separando la lógica de la presentación y las interacciones del jugador.
-- **Interfaz `Collectible`**: Define el método `collect()` para los objetos que el jugador puede recolectar. Esto permite añadir nuevos objetos recolectables de manera sencilla.
-- **Incremento progresivo de dificultad**: El juego se vuelve más desafiante a medida que se alcanzan ciertos hitos de puntaje, generando una mayor cantidad de obstáculos y aumentando su velocidad.
+- **Encapsulamiento:** Gestión controlada de atributos a través de getters y setters.
+- **Abstracción y Polimorfismo:** Uso de clases abstractas e interfaces para garantizar un comportamiento extensible y modular.
+- **Principio de Responsabilidad Única (SRP):** Cada clase se encarga de una única tarea específica.
+- **Principio Abierto/Cerrado (OCP):** El sistema permite incorporar nuevas funcionalidades sin modificar el código existente.
 
-## Menú Interactivo
+## 📜 Patrones de Diseño Aplicados
 
-El juego se maneja principalmente con un menú gráfico que permite al jugador iniciar una partida, pausar el juego o salir. En cada partida, el jugador debe usar las teclas de dirección para moverse y recolectar ítems o evitar bombas.
+1. **Singleton:** Centraliza configuraciones globales como dificultad, puntuación máxima y estado del audio.
+2. **Template Method:** Centraliza la lógica compartida de los objetos que caen, delegando detalles específicos a las subclases.
+3. **Strategy:** Separa los patrones de movimiento, permitiendo intercambiarlos dinámicamente.
+4. **Abstract Factory:** Gestiona la creación desacoplada de diferentes tipos de botiquines.
 
-## Buenas Prácticas
+## 🔧 Requisitos del Sistema
 
-- **Encapsulamiento**: Los atributos en las clases están encapsulados y accesibles mediante getters y setters para proteger la integridad del juego.
-- **Uso de Polimorfismo y Herencia**: Se emplea herencia en la clase abstracta `Botiquin` y sus subclases para implementar los diferentes tipos de botiquines.
-- **Control de Versiones**: Se recomienda el uso de control de versiones con commits frecuentes para documentar el desarrollo.
+- **Java 8** o superior.
+- **LibGDX Framework.**
+- Entorno de desarrollo recomendado: **IntelliJ IDEA.**
 
-## Requisitos
+## 🕹️ Instrucciones de Ejecución
 
-- **Java 8** o superior
-- **LibGDX**: Configurado en el entorno de desarrollo para ejecutar el proyecto
-- **Consola**: Para ejecutar los comandos de compilación, si es necesario
+1. **Clonar el repositorio:**  
+   `git clone <url-del-repositorio>`
+2. **Configurar LibGDX:**  
+   Sigue las instrucciones en [LibGDX Setup](https://libgdx.com/wiki/start/setup).
+3. **Compilar y ejecutar:**  
+   Ejecuta desde la clase `Lwjgl3Launcher` ubicada en:  
+   `GameLluviaMenu2024/lwjgl3/src/main/java/puppy/code/lwjgl3/Lwjgl3Launcher.java`.
 
-## Instrucciones de Ejecución
+---
 
-1. **Clonar el repositorio**: `git clone <url-del-repositorio>`
-2. **Navegar al directorio del proyecto**: `cd <nombre-del-directorio>`
-3. **Preparar LibGDX**: Por favor guiarse de las instrucciones de instalación explicadas en la siguiente página:
-   https://libgdx.com/wiki/start/setup.
-5. **Compilar y ejecutar el proyecto**: De preferencia en el entorno de desarrollo IntelliJ IDEA, esto en la direccion "GameLluviaMenu2024\lwjgl3\src\main\java\puppy\code\lwjgl3\Lwjgl3Launcher.java"
+## 🏫 Universidad y Créditos
 
-## Pontificia Universidad Católica de Valparaíso - Facultad de Ingeniería - Escuela de Ingeniería Informática
+**Pontificia Universidad Católica de Valparaíso**  
+**Facultad de Ingeniería - Escuela de Ingeniería Informática**  
 
-**Integrantes del proyecto:**
-- Matías Pardo
-- Juan Pablo Pizarro
-- Joaquín Saldivia 
+### 👨‍💻 Integrantes del Proyecto:
+
+- Matías Pardo  
+- Juan Pablo Pizarro  
+- Joaquín Saldivia  
+
+---
+
+🎉 ¡Gracias por leer y esperamos que disfrutes el juego! 🚀
