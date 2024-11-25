@@ -3,28 +3,19 @@ package puppy.code;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 
-public class BotiquinPequeno extends Botiquin implements Collectible {
-    // Constructor para inicializar el botiquín pequeño con su textura y posición
-    public BotiquinPequeno(Texture texture, float x, float y, Sound ladridoSound) {
-        super(texture, x, y, 32.0F, 32.0F, ladridoSound);
-    }
-    // Implementación del efecto específico para el botiquín pequeño
-    @Override
-    public void aplicarEfecto(Tarro tarro) {
-        // Si el jugador tiene menos de tres vidas, se suma una vida
-        if (tarro.getVidas() < 3) {
-            tarro.sumarVida(1);
-        } else {
-            // Si ya tiene el máximo de vidas, se otorgan puntos adicionales
-            tarro.sumarPuntos(50);
-        }
-        // Reproduce un sonido al recoger el botiquín
-        this.reproducirLadrido();
+public class BotiquinPequeno extends Botiquin {
+
+    public BotiquinPequeno(Texture textura, float x, float y, Sound sonido) {
+        super(textura, x, y, 32, 32, new MovimientoVertical(100), sonido); // Movimiento Vertical
     }
 
     @Override
-    public void collect(Tarro tarro) {
-        // Llamamos a aplicarEfecto que ya está implementado
-        this.aplicarEfecto(tarro);
+    public void aplicarEfecto(Tarro tarro) {
+        if (tarro.getVidas() < 3) {
+            tarro.sumarVida(1);
+        } else {
+            tarro.sumarPuntos(50);
+        }
+        reproducirLadrido(); // Reproduce el sonido
     }
 }
